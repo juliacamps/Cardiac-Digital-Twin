@@ -3,7 +3,7 @@
 
 
 
-The code will be made available after peer review. 
+The code will be made available after peer review of the publication. 
 
 Status: under review in Medical Image Analysis.
 
