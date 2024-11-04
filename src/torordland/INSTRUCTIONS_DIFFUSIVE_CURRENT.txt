@@ -1,0 +1,25 @@
+Step 1: Using calibrated endocardial activation pattern, simulate QRS in monodomain while outputting the EFLUX variable
+in Alya. This is the (D \grad V) term of the diffusion term. Post process this to Ensight format
+
+Step 2: Read in Ensight format to paraview version 5.10.0. Perform the following filters in ordeR:
+Merge blocks
+Gradient -> Divergence. Save name as Divergence_units - because the units of this divergence is not what we want.
+Calculator -> Divergence = Divergence_units/1000
+
+The unit conversion is as follows:
+
+\nabla D \grad V has units of [cm^-1] * [cm^2 * ms^-1] * [cm^-1] * [mV] = [mV * ms^-1]
+
+Within Alya, the diffusivity coefficients of D are scaled by 1000, to make its units to be [cm^2 * s^-1], and so the
+values of EFLUX needs to be divded by 1000 in order to recover the [cm^2 * ms^-1] units that are required to produce
+a diffusive current with units [mV * ms^-1], which is equivalent to [\microA * \microF^-1]
+
+Step 3: Save data as .vtu files, save both Divergence and INTRA arrays, writing out as time series and ASCII files, for e
+ase of post-processing in Python (see personalise_to_Twave_rodero.py under extract_diffusive_currents:)
+
+NOTE: This entire sequence up to step 2 has been saved as a paraview state that can be read in, given compatible
+paraview versioning, in diffusive_curernt_extraction.pvsm.
+
+Good luck.
+Jenny
+5 April 2023
