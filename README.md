@@ -9,7 +9,7 @@ https://doi.org/10.1016/j.media.2024.103361
 
 
 
-###	Code structure of the digital twinning pipeline
+##	Code structure of the digital twinning pipeline
 
 The code has been packaged for ease of adoption and future extension. The digital twinning code is mostly in Python, except for the scripts for generating the action potential look-up tables in Matlab.
 The code is divided into modules with distinct responsibilities to facilitate integration with other existing workflows. These modules and their responsibilities are as follows:
