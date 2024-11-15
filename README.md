@@ -5,7 +5,8 @@ _Harnessing 12-lead ECG and MRI data to personalise repolarisation profiles in c
 
 https://doi.org/10.1016/j.media.2024.103361
 
-### Example data (meshes, ECGs, electrodes, cellular models, digital twins, etc.) to run this code, generate new digital twins, and reproduce the results in the paper can be found in the Cardiac_Digital_Twin_Data repository in Zenodo at https://doi.org/10.5281/zenodo.14034739.
+## Example data 
+The meshes, ECGs, electrodes, cellular models, digital twins, etc. to run this code, generate new digital twins, and reproduce the results in the paper can be found in the Cardiac_Digital_Twin_Data repository in Zenodo at https://doi.org/10.5281/zenodo.14034739.
 
 
 
