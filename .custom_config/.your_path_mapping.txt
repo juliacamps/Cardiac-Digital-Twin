@@ -1,0 +1,1 @@
+{"data_path":"C:/Users/julia/PycharmProjects/Cardiac_Personalisation/example_data/meta_data/","results_path":"C:/Users/julia/PycharmProjects/Cardiac_Personalisation/example_data/meta_data/results/"}
