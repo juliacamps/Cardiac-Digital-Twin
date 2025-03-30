@@ -12,6 +12,7 @@ import pymp
 # Environment variables
 # TODO change all codes to just use np.nan directly instead of this, becuase future versions of python don't support casting np.nan to integer
 nan_value = -2147483648  # min value for int32 #np.array([np.nan]).astype(np.int32)[0]
+use_parallel = False
 
 def get_nan_value():
     return nan_value
@@ -72,6 +73,18 @@ def get_best_str():
 # HPC functions
 def run_job(job_file_path):
     os.system('sbatch ' + job_file_path)
+
+
+def get_parallel_loop(data_size):
+    threadsNum = multiprocessing.cpu_count()
+    if use_parallel and threadsNum > 1:
+        # with pymp.Parallel(min(threadsNum, points_to_map_xyz.shape[0])) as p1:
+        p1 = pymp.Parallel(min(threadsNum, data_size))
+        iter_gen = p1.range(data_size)
+    else:
+        print('Running in single thread!')
+        iter_gen = range(data_size)
+    return iter_gen
 
 
 # Anatomical landmarks using ventricular coordinates
@@ -830,14 +843,17 @@ def insert_sorted(aList, newV):
 def map_indexes(points_to_map_xyz, reference_points_xyz, error_tolerance=0.5):
     """The error tolerance is set assuming that all data is in cm units, which should be consistent in all scripts as of March 2024"""
     mapped_indexes = pymp.shared.array((points_to_map_xyz.shape[0]), dtype=int)
-    threadsNum = multiprocessing.cpu_count()
+    # threadsNum = multiprocessing.cpu_count()
     error_cumm = pymp.shared.array((points_to_map_xyz.shape[0]), dtype=float)
     error_cumm[:] = get_nan_value()  # Make sure that every node is visited or it will give problems later
     # Uncomment the following lines to turn off the parallelisation.
     # if True:
     #     for node_i in range(points_to_map_xyz.shape[0]):
-    with pymp.Parallel(min(threadsNum, points_to_map_xyz.shape[0])) as p1:
-        for node_i in p1.range(points_to_map_xyz.shape[0]):
+    iter_gen = get_parallel_loop(data_size=points_to_map_xyz.shape[0])
+    for node_i in iter_gen:
+        if True:
+    # with pymp.Parallel(min(threadsNum, points_to_map_xyz.shape[0])) as p1:
+    #     for node_i in p1.range(points_to_map_xyz.shape[0]):
             mapped_indexes[node_i] = np.argmin(
                 np.linalg.norm(reference_points_xyz - points_to_map_xyz[node_i, :], ord=2, axis=1)).astype(int)
             error_cumm[node_i] = np.amin(

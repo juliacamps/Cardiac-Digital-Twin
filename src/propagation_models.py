@@ -3,10 +3,10 @@ from warnings import warn
 import math
 import pymp
 import numpy as np
-import multiprocessing
+# import multiprocessing
 import numba
 
-from utils import get_nan_value, insert_sorted
+from utils import get_nan_value, insert_sorted, get_parallel_loop
 
 
 class EmptyPropagation:
@@ -285,13 +285,16 @@ class EikonalDjikstraTet(ElectricalPropagation):
         parameter_population_unique, unique_indexes = np.unique(parameter_population, return_inverse=True, axis=0)
         lat_list = pymp.shared.array((parameter_population_unique.shape[0], self.geometry.node_xyz.shape[0]), dtype=np.float64)
         lat_list[:, :] = get_nan_value()
-        threads_num = multiprocessing.cpu_count()
+        # threads_num = multiprocessing.cpu_count()
         # Uncomment the following lines to turn off the parallelisation of the Eikonal computation.
         # if True:    # Turns off the parallel functionality
         #     print('Parallel loop turned off in module: ' + self.module_name)
         #     for conf_i in range(lat_list.shape[0]):    # Turns off the parallel functionality
-        with pymp.Parallel(min(threads_num, lat_list.shape[0])) as p1:
-            for conf_i in p1.range(lat_list.shape[0]):
+        iter_gen = get_parallel_loop(data_size=lat_list.shape[0])
+        for conf_i in iter_gen:
+            if True:
+        # with pymp.Parallel(min(threads_num, lat_list.shape[0])) as p1:
+        #     for conf_i in p1.range(lat_list.shape[0]):
                 parameters = parameter_population_unique[conf_i, :]
                 lat_list[conf_i, :] = np.round(self.simulate_lat(parameters)).astype(np.int32)
         return lat_list[unique_indexes]

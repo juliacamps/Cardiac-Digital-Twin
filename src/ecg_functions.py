@@ -1,7 +1,7 @@
 # This file contains the ECG computation class
 # And all the methods for ECG computation that can be considered
-import multiprocessing
-from abc import ABC
+# import multiprocessing
+# from abc import ABC
 
 import numpy as np
 import pymp
@@ -11,7 +11,7 @@ from warnings import warn
 
 from postprocess_functions import plot_histogram, visualise_ecg
 from utils import get_nan_value, get_nb_precordial_lead, get_lead_V1_index, \
-    normalise_field_to_zero_one, get_nb_unique_lead
+    normalise_field_to_zero_one, get_nb_unique_lead, get_parallel_loop
 
 
 # Generic calculations
@@ -158,12 +158,15 @@ def calculate_ecg_biomarker_from_only_ecg(heart_rate, max_lat_list, predicted_ec
     # tpeak_dispersion_v5_v3[:] = get_nan_value()
     # ecg_lead_biomarker[:, :] = get_nan_value()
     # ecg_mean_biomarker[:, :] = get_nan_value()
-    threads_num = multiprocessing.cpu_count()
+    # threads_num = multiprocessing.cpu_count()
     # Uncomment the following lines to turn off the parallelisation.
     # if True:
     #     for sample_i in range(qt_dur_lead.shape[0]):
-    with pymp.Parallel(min(threads_num, qtc_dur_lead.shape[0])) as p1:
-        for sample_i in p1.range(qtc_dur_lead.shape[0]):
+    iter_gen = get_parallel_loop(data_size=qtc_dur_lead.shape[0])
+    for sample_i in iter_gen:
+        if True:
+    # with pymp.Parallel(min(threads_num, qtc_dur_lead.shape[0])) as p1:
+    #     for sample_i in p1.range(qtc_dur_lead.shape[0]):
             # qt_dur_list = np.zeros((nb_leads))
             # t_pe_list = np.zeros((nb_leads))
             # t_peak_list = np.zeros((nb_leads))
@@ -362,12 +365,15 @@ def calculate_ecg_qrs_axis(max_lat, predicted_ecg):
 
 def calculate_ecg_qrs_axis_population(max_lat_list, predicted_ecg_list):
     qrs_axis_list = pymp.shared.array((predicted_ecg_list.shape[0]), dtype=np.float64)
-    threads_num = multiprocessing.cpu_count()
+    # threads_num = multiprocessing.cpu_count()
     # Uncomment the following lines to turn off the parallelisation.
     # if True:
     #     for sample_i in range(qrs_axis_list.shape[0]):
-    with pymp.Parallel(min(threads_num, qrs_axis_list.shape[0])) as p1:
-        for sample_i in p1.range(qrs_axis_list.shape[0]):
+    iter_gen = get_parallel_loop(data_size=qrs_axis_list.shape[0])
+    for sample_i in iter_gen:
+        if True:
+    # with pymp.Parallel(min(threads_num, qrs_axis_list.shape[0])) as p1:
+    #     for sample_i in p1.range(qrs_axis_list.shape[0]):
             qrs_axis_list[sample_i] = calculate_ecg_qrs_axis(max_lat=max_lat_list[sample_i],
                                               predicted_ecg=predicted_ecg_list[sample_i, :, :])
     return qrs_axis_list
@@ -486,12 +492,15 @@ def calculate_ecg_qrs_nb_peak_pos_neg(max_lat, predicted_ecg):
 
 def calculate_ecg_qrs_nb_peak_pos_neg_population(max_lat_list, predicted_ecg_list):
     qrs_nb_peak_per_lead_list = pymp.shared.array((predicted_ecg_list.shape[0], predicted_ecg_list.shape[1], 2), dtype=np.float64)
-    threads_num = multiprocessing.cpu_count()
+    # threads_num = multiprocessing.cpu_count()
     # Uncomment the following lines to turn off the parallelisation.
     # if True:
     #     for sample_i in range(qrs_nb_peak_per_lead_list.shape[0]):
-    with pymp.Parallel(min(threads_num, qrs_nb_peak_per_lead_list.shape[0])) as p1:
-        for sample_i in p1.range(qrs_nb_peak_per_lead_list.shape[0]):
+    iter_gen = get_parallel_loop(data_size=qrs_nb_peak_per_lead_list.shape[0])
+    for sample_i in iter_gen:
+        if True:
+    # with pymp.Parallel(min(threads_num, qrs_nb_peak_per_lead_list.shape[0])) as p1:
+    #     for sample_i in p1.range(qrs_nb_peak_per_lead_list.shape[0]):
             qrs_nb_peak_per_lead_list[sample_i, :, :] = calculate_ecg_qrs_nb_peak_pos_neg(
                 max_lat=max_lat_list[sample_i], predicted_ecg=predicted_ecg_list[sample_i, :, :])
     return qrs_nb_peak_per_lead_list
@@ -790,13 +799,16 @@ class PseudoEcgTetFromVM(CalculateEcg):
         ecg_population_unique = pymp.shared.array((vm_population_unique.shape[0], self.nb_leads,
                                                    vm_population_unique.shape[2]), dtype=np.float64)
         ecg_population_unique[:, :, :] = get_nan_value()
-        threads_num = multiprocessing.cpu_count()
+        # threads_num = multiprocessing.cpu_count()
         # Uncomment the following lines to turn off the parallelisation of the ecg computation.
         # if True:
         #     print('Parallel loop turned off in ecg module')
         #     for conf_i in range(ecg_population_unique.shape[0]):
-        with pymp.Parallel(min(threads_num, ecg_population_unique.shape[0])) as p1:
-            for conf_i in p1.range(ecg_population_unique.shape[0]):
+        iter_gen = get_parallel_loop(data_size=ecg_population_unique.shape[0])
+        for conf_i in iter_gen:
+            if True:
+        # with pymp.Parallel(min(threads_num, ecg_population_unique.shape[0])) as p1:
+        #     for conf_i in p1.range(ecg_population_unique.shape[0]):
                 aux_ecg = self.calculate_ecg(lat=lat_population_unique[conf_i, :], vm=vm_population_unique[conf_i, :, :])
                 # ecg_len = int(aux_ecg.shape[1])
                 ecg_population_unique[conf_i, :, :aux_ecg.shape[1]] = aux_ecg
