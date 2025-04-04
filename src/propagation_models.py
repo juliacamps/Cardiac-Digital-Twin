@@ -143,7 +143,7 @@ class EikonalDjikstraTet(ElectricalPropagation):
         # TODO REIMPLEMENT THE FOLLOWING SECTION USING FUNCTIONS FROM conduction_system.py
         # Numba compatibility
         y = np.empty_like(root_node_meta_indexes)
-        root_node_meta_indexes = np.round_(root_node_meta_indexes, 0, y)
+        root_node_meta_indexes = np.round(root_node_meta_indexes, 0, y)
         y = None
 
         candidate_root_node_indexes = self.get_candidate_root_node_index()
