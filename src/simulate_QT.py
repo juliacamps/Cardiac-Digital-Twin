@@ -97,6 +97,7 @@ def plot_ecg(predicted_ecg, clinical_ecg, lead_names):
     return plt
 
 if __name__ == '__main__':
+    t_start = time.time()
     # Step 0: Set the random seed for Reproducibility:
     random_seed_value = 7  # Ensures reproducibility and turns off stochasticity
     np.random.seed(seed=random_seed_value)  # Ensures reproducibility and turns off stochasticity
@@ -119,7 +120,7 @@ if __name__ == '__main__':
 
     # Output Paths:
     experiment_type = 'simulation_QT'
-    AP_type = 'MitchellSchaefferEP'  # choose the action potential model
+    AP_type = 'MitchellSchaefferEP'  # choose the action potential model, ToROrd or MitchellSchaefferEP
     # Define the electrophysiology model to use:
     if AP_type == 'MitchellSchaefferEP':
         ep_model = 'MitchellSchaefferEP'
@@ -146,33 +147,28 @@ if __name__ == '__main__':
         print('Using cellular data from: ', cellular_data_dir_complete)
     # Build results folder structure
     results_dir_root = data_dir + 'results/'
-    if not os.path.exists(results_dir_root):
-        os.mkdir(results_dir_root)
-    results_dir_part = results_dir_root + experiment_type + '_data/'
-    if not os.path.exists(results_dir_part):
-        os.mkdir(results_dir_part)
-    results_dir_part = results_dir_part + anatomy_subject_name + '/'
-    if not os.path.exists(results_dir_part):
-        os.mkdir(results_dir_part)
-        
+    results_dir_part = results_dir_root + experiment_type + '_data/' + anatomy_subject_name + '/'
+
     if AP_type != 'MitchellSchaefferEP':
         results_dir_part = results_dir_part + 'qt_' + gradient_ion_channel_str + '_' + ep_model + '/'
     else:
         results_dir_part = results_dir_part + 'ms_ep/'
         
     if not os.path.exists(results_dir_part):
-        os.mkdir(results_dir_part)
+        os.makedirs(results_dir_part, exist_ok=True)
+        
     # Use date to name the result folder to preserve some history of results
     current_month_text = datetime.now().strftime('%h')  # Feb
     current_year_full = datetime.now().strftime('%Y')  # 2018
+    current_time_text = datetime.now().strftime('%H%M%S')  # 231530
     # results_dir = results_dir_part + 'qt_' + gradient_ion_channel_str + '_' + ep_model + '/smoothing_fibre_128_64_05/' #+ '/smoothing_fibre_256_64_05/'
-    results_dir = results_dir_part + current_month_text + '_' + current_year_full + '/'
+    results_dir = results_dir_part + current_month_text + '_' + current_year_full + '/'+current_time_text + '/'
     if not os.path.exists(results_dir):
-        os.mkdir(results_dir)
+        os.makedirs(results_dir, exist_ok=True)
     # save ecg
     visualisation_dir = results_dir + 'checkpoint/'
     if not os.path.exists(visualisation_dir):
-        os.mkdir(visualisation_dir)
+        os.makedirs(visualisation_dir, exist_ok=True)
     figure_result_file_name = visualisation_dir + anatomy_subject_name + '_' + source_resolution + '_ecg.png'
         
     # Module names:
@@ -484,7 +480,10 @@ if __name__ == '__main__':
     # Simulate 12-lead ECGs
     healthy_predicted_ecg, max_lat = evaluator_ecg.simulate_parameter_particle(
         parameter_particle=parameter_particle)
-
+    
+    t_end = time.time()
+    print('TOTAL SIMULATION TIME ', round(t_end - t_start, 2), ' seconds.')
+    
     # Step 14: Visualise simulated activation map.
     # print('Step 14: Visualise simulated activation map.')
     plot_geometry(xyz=geometry.get_node_xyz(), surf=extract_surface(geometry.get_tetra()), lat_simulation=lat_simulation)
